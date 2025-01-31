@@ -1,0 +1,72 @@
+﻿@rendermode InteractiveServer
+
+@page "/status"
+
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<h3>Waking Up the Server...</h3>
+<p>@message</p>
+
+@if (!isOnline)
+{
+    <p>Please wait while the system starts.</p>
+    <p>If this takes too long, ensure Wake-on-LAN is enabled.</p>
+    
+    <h4>Redirecting in: <b>@countdown</b> seconds</h4>
+}
+
+@code {
+    private string message = "Checking server status...";
+    private bool isOnline = false;
+    private int countdown = 60; // Initial countdown time (seconds)
+    private System.Threading.Timer? timer;
+
+    protected override void OnInitialized()
+    {
+        // Start a timer to check the server status every 5 seconds
+        timer = new System.Threading.Timer(async _ => await CheckServerStatus(), null, 0, 1000);
+    }
+
+    private async Task CheckServerStatus()
+    {
+        isOnline = await IsMachineOnline();
+
+        if (isOnline)
+        {
+            timer?.Dispose(); // Stop the timer when the server is online
+            message = "✅ Server is online! Redirecting now...";
+            await Task.Delay(2000);
+            Navigation.NavigateTo("/", true);
+        }
+        else
+        {
+            // Update countdown every 1 sec
+            if (countdown > 0)
+            {
+                countdown -= 1;
+            }
+            else
+            {
+                message = "⚠️ Server is still offline. Please check manually.";
+                timer?.Dispose(); // Stop the timer if the countdown reaches zero
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task<bool> IsMachineOnline()
+    {
+        try
+        {
+            string apiUrl = $"{Navigation.BaseUri}api/status"; // Use base URI
+            var response = await Http.GetAsync(apiUrl);
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+}

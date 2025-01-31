@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>97d42c5d-df68-4dee-b374-201a7adbee27</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Yarp.ReverseProxy" Version="2.2.0" />
+      <PackageReference Include="DotNetJet.FluentValidation.DependencyInjection" Version="0.1.0-alpha.28" />
+    </ItemGroup>
+
+</Project>
